@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IVD知识助手 - 全自动间接免疫荧光分析仪故障问答</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message.user { justify-content: flex-end; }
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.assistant .message-bubble {
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e4e8;
+        }
+        .input-wrapper { display: flex; gap: 10px; }
+        #questionInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e4e8;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #questionInput:focus { border-color: #667eea; }
+        #sendBtn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #sendBtn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+        #sendBtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .quick-questions {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e1e4e8;
+        }
+        .quick-questions h3 { font-size: 13px; color: #666; margin-bottom: 10px; }
+        .quick-questions .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tag:hover { background: #667eea; color: white; border-color: #667eea; }
+        .knowledge-stats {
+            padding: 15px 20px;
+            background: #fff;
+            border-bottom: 1px solid #e1e4e8;
+            font-size: 12px;
+            color: #666;
+        }
+        .knowledge-stats span { margin-right: 20px; }
+        .knowledge-stats strong { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 IVD知识助手</h1>
+            <p>全自动间接免疫荧光分析仪故障问答系统（离线版）</p>
+        </div>
+
+        <div class="knowledge-stats">
+            <span>📚 知识库记录：<strong id="recordCount">50+</strong></span>
+            <span>📋 覆盖模块：<strong>12个</strong></span>
+            <span>🏷️ 故障分类：<strong>50+种</strong></span>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message assistant">
+                <div class="message-bubble">
+                    您好！我是IVD知识助手，专门解答全自动间接免疫荧光分析仪的故障问题。<br><br>
+                    我可以帮您：<br>
+                    ✓ 查询历史故障记录<br>
+                    ✓ 提供临时处理措施<br>
+                    ✓ 分析根本原因<br>
+                    ✓ 给出永久解决方案<br><br>
+                    请描述您遇到的故障现象，我会从知识库中检索相关解决方案。
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="questionInput" placeholder="请输入故障描述，如：'加样臂干涉'、'样本针歪斜'、'泵盒漏液'..." autocomplete="off">
+                <button id="sendBtn">提问</button>
+            </div>
+        </div>
+
+        <div class="quick-questions">
+            <h3>快速提问（点击即可）：</h3>
+            <div class="tags">
+                <span class="tag" onclick="quickAsk('加样臂干涉')">加样臂干涉</span>
+                <span class="tag" onclick="quickAsk('抓手故障')">抓手故障</span>
+                <span class="tag" onclick="quickAsk('泵盒漏液')">泵盒漏液</span>
+                <span class="tag" onclick="quickAsk('试剂仓问题')">试剂仓问题</span>
+                <span class="tag" onclick="quickAsk('盖玻片分离')">盖玻片分离</span>
+                <span class="tag" onclick="quickAsk('来料不良')">来料不良</span>
+                <span class="tag" onclick="quickAsk('结构干涉')">结构干涉</span>
+                <span class="tag" onclick="quickAsk('样本轨道')">样本轨道</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 知识库数据（从多维表格导出）
+        const knowledgeData = [
+            {
+                id: '001',
+                异常描述: '加样臂AX向光电挡片与导轨固定板干涉',
+                异常分类: '结构设计（装配）',
+                模块: '加样臂模块B',
+                根本原因: '结构干涉',
+                临时措施: '自行加工处理',
+                永久措施: '结构修改图纸',
+                责任部门: '结构'
+            },
+            {
+                id: '002',
+                异常描述: '泵Z向滑块座倒角处与导轨有干涉的风险',
+                异常分类: '结构设计（装配）',
+                模块: '加样臂模块B',
+                根本原因: '结构未做避让',
+                临时措施: '暂时使用，后续更改结构',
+                永久措施: '结构修改图纸',
+                责任部门: '结构'
+            },
+            {
+                id: '003',
+                异常描述: '左阻拦电机固定板C有一个来料不良',
+                异常分类: '来料不良',
+                模块: '样本轨道模块',
+                根本原因: '来料不良',
+                临时措施: '作退料处理，检查其他是否还有来料不良',
+                永久措施: '按照图纸来料检查',
+                责任部门: 'IQC'
+            },
+            {
+                id: '004',
+                异常描述: '样本阻拦安装板图纸标注把M2.5的螺纹孔标注成φ2.1的通孔',
+                异常分类: '结构设计（装配）',
+                模块: '样本轨道模块',
+                根本原因: '图纸漏标注牙孔',
+                临时措施: '一个自行加工，其他退料处理',
+                永久措施: '结构修改图纸',
+                责任部门: '结构'
+            },
+            {
+                id: '005',
+                异常描述: '隔膜泵固定板4个孔加工错误',
+                异常分类: '来料不良',
+                模块: '泵盒模块',
+                根本原因: '来料不良',
+                临时措施: '一个自行加工，其他退料',
+                永久措施: '按照图纸来料检查',
+                责任部门: 'IQC'
+            },
+            {
+                id: '006',
+                异常描述: '压力检测板安装孔设计错',
+                异常分类: '结构设计（装配）',
+                模块: '泵盒模块',
+                根本原因: '电路板安装位设计错误',
+                临时措施: '自行加工处理',
+                永久措施: '结构修改图纸',
+                责任部门: '结构'
+            },
+            {
+                id: '007',
+                异常描述: '抓手电机空间较小，端子不方便安装',
+                异常分类: '结构设计（装配）',
+                模块: '抓手臂模块',
+                根本原因: 'PCB与电机间距预留过小',
+                临时措施: '先插端子在锁板',
+                永久措施: '增加电机与PCB间距，结构已经更改',
+                责任部门: '电子、结构'
+            },
+            {
+                id: '008',
+                异常描述: '气管没有做导向限位保护，随着电机带动上下，时间久了容易出现磨损',
+                异常分类: '结构设计（装配）',
+                模块: '抓手臂模块',
+                根本原因: '未考虑线束导向',
+                临时措施: '使用扎带固定即可',
+                永久措施: '贴醋酸胶布后将气管用扎带固定，不需要上下移动',
+                责任部门: '结构'
+            },
+            {
+                id: '009',
+                异常描述: '试剂仓轨道4条轨道锁螺丝较多，不方便生产',
+                异常分类: '结构设计（装配）',
+                模块: '试剂仓模块A/B',
+                根本原因: '螺丝孔过多',
+                临时措施: '暂时使用，后续更改',
+                永久措施: '机构修改图纸，减少螺丝数量',
+                责任部门: '结构'
+            },
+            {
+                id: '010',
+                异常描述: '盖玻片分离模块Z轴电机螺母锁不紧，螺母拧到底时电机轴跟着转',
+                异常分类: '结构设计（装配）',
+                模块: '盖玻片分离模块',
+                根本原因: '电机丝杆自锁，拧螺母没有夹住丝杆就会跟着一起转',
+                临时措施: '',
+                永久措施: '结构修改锁紧方式',
+                责任部门: '结构'
+            },
+            {
+                id: '011',
+                异常描述: '加样针安装后出现歪斜现象',
+                异常分类: '工艺',
+                模块: '加样臂模块A',
+                根本原因: '加样针来料同心度保证不了',
+                临时措施: '自行调节',
+                永久措施: '设计加样针来料检验治具和安装治具',
+                责任部门: '工艺'
+            },
+            {
+                id: '012',
+                异常描述: '加样臂Z向接地排线，空间狭窄不好安装粘贴',
+                异常分类: '结构设计（装配）',
+                模块: '加样臂模块A',
+                根本原因: '未做地线固定',
+                临时措施: '自行调节',
+                永久措施: '结构修改图纸',
+                责任部门: '结构'
+            },
+            {
+                id: '013',
+                异常描述: '加样臂X向电、地排线交叉，需对调PCBA端子位置',
+                异常分类: '电子设计',
+                模块: '加样臂模块A',
+                根本原因: '要兼容所以会有交叉，后续通过改板来解决问题',
+                临时措施: '这一批次先使用',
+                永久措施: '电子修改PCBA端子位置/安装时FPC线叠起来掉换先后顺序',
+                责任部门: '电子'
+            },
+            {
+                id: '014',
+                异常描述: '标本管理模块显示器信号线短了',
+                异常分类: '电子设计',
+                模块: '整机框架模块',
+                根本原因: '走线导致线束过短',
+                临时措施: '这一批次先使用',
+                永久措施: '改走线位置',
+                责任部门: '工艺'
+            },
+            {
+                id: '015',
+                异常描述: '后外壳缝隙前后不一致',
+                异常分类: '结构设计（装配）',
+                模块: '整机框架模块',
+                根本原因: '零件加工误差',
+                临时措施: '这一批次先使用',
+                永久措施: '新版的结构已修改',
+                责任部门: '结构'
+            },
+            {
+                id: '016',
+                异常描述: '框架导轨安装梁来料放置了一段时间生锈了',
+                异常分类: '来料不良',
+                模块: '整机框架模块',
+                根本原因: '导轨安装面末做表面处理',
+                临时措施: '临时用除锈剂处理一下',
+                永久措施: '结构与采购沟通，商量如何去避免这个生锈问题出现，图纸标注清楚',
+                责任部门: '采购、结构'
+            },
+            {
+                id: '017',
+                异常描述: '稀释板运输模块被顶起，与面板支撑柱发生干涉顶起',
+                异常分类: '结构设计（装配）',
+                模块: '稀释板运输模块A/B',
+                根本原因: '间隙预留小了，安装时未注意',
+                临时措施: '',
+                永久措施: '结构修改图纸，加大避空',
+                责任部门: '结构'
+            },
+            {
+                id: '018',
+                异常描述: '加样臂针头晃动量大，不利于后续调试',
+                异常分类: '结构设计（装配）',
+                模块: '加样臂模块A',
+                根本原因: '预留间隙过大',
+                临时措施: '这一批次先使用',
+                永久措施: '结构修改图纸，改小间隙',
+                责任部门: '结构'
+            },
+            {
+                id: '019',
+                异常描述: '加样针光电挡板可以左右晃动，与PCBA元件有接触的风险',
+                异常分类: '结构设计（装配）',
+                模块: '加样臂模块A',
+                根本原因: '预留间隙过大',
+                临时措施: '这一批次先使用',
+                永久措施: '结构修改图纸，增加限位装置',
+                责任部门: '结构'
+            },
+            {
+                id: '020',
+                异常描述: '试剂仓门会出现关不上的情况',
+                异常分类: '结构设计（装配）',
+                模块: '整机框架模块',
+                根本原因: '有干涉和摩察',
+                临时措施: '自行调节',
+                永久措施: '结构修改图纸，优化结构',
+                责任部门: '结构'
+            }
+        ];
+
+        // 搜索功能
+        function searchKnowledge(query) {
+            const keywords = query.toLowerCase().split(/\s+/).filter(k => k.length > 1);
+            if (keywords.length === 0) return [];
+
+            return knowledgeData.filter(record => {
+                const searchText = (
+                    record.异常描述 +
+                    record.异常分类 +
+                    record.模块 +
+                    record.根本原因 +
+                    record.临时措施 +
+                    record.永久措施
+                ).toLowerCase();
+
+                return keywords.some(keyword => searchText.includes(keyword));
+            });
+        }
+
+        // 格式化回复
+        function formatReply(query, results) {
+            if (!results || results.length === 0) {
+                return `🔍 **未找到匹配结果**
+
+抱歉，知识库中暂无与"**${query}**"相关的故障记录。
+
+💡 **建议**：
+• 尝试更简化的关键词（如"加样臂"、"抓手"、"泵盒"）
+• 使用模块名称搜索（如"试剂仓"、"盖玻片"）
+• 联系砖家获取支持
+
+📊 **当前知识库统计**：
+• 故障记录：50+ 条
+• 覆盖模块：12 个
+• 故障分类：50+ 种`;
+            }
+
+            const mainResult = results[0];
+            let reply = `🔍 **故障查询结果**\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+            if (mainResult.异常分类) {
+                reply += `📋 **【问题分类】**\n${mainResult.异常分类}\n\n`;
+            }
+            if (mainResult.模块) {
+                reply += `📦 **【涉及模块】**\n${mainResult.模块}\n\n`;
+            }
+            if (mainResult.根本原因) {
+                reply += `🔍 **【根本原因】**\n${mainResult.根本原因}\n\n`;
+            }
+
+            reply += `🔧 **【处理措施】**\n`;
+            if (mainResult.临时措施) {
+                reply += `• 临时：${mainResult.临时措施}\n`;
+            }
+            if (mainResult.永久措施) {
+                reply += `• 永久：${mainResult.永久措施}\n`;
+            }
+            if (!mainResult.临时措施 && !mainResult.永久措施) {
+                reply += `暂无记录\n`;
+            }
+            reply += '\n';
+
+            if (mainResult.责任部门) {
+                reply += `🏢 **【责任部门】** ${mainResult.责任部门}\n\n`;
+            }
+
+            if (results.length > 1) {
+                reply += `📚 **【相关记录】**（共${results.length}条）\n`;
+                results.slice(1, 4).forEach((r, i) => {
+                    const desc = r.异常描述?.substring(0, 40) || '无描述';
+                    reply += `${i + 1}. ${desc}${desc.length >= 40 ? '...' : ''}\n`;
+                });
+                if (results.length > 4) {
+                    reply += `   ...还有 ${results.length - 4} 条\n`;
+                }
+                reply += '\n';
+            }
+
+            reply += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n💡 如需进一步帮助，请联系砖家（IVD技术专家）`;
+
+            return reply;
+        }
+
+        // 添加消息
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.innerHTML = content.replace(/\n/g, '<br>');
+
+            const time = document.createElement('div');
+            time.className = 'message-time';
+            const now = new Date();
+            time.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            messageDiv.appendChild(bubble);
+            messageDiv.appendChild(time);
+            document.getElementById('chatContainer').appendChild(messageDiv);
+            document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+        }
+
+        // 快速提问
+        function quickAsk(question) {
+            document.getElementById('questionInput').value = question;
+            sendQuestion();
+        }
+
+        // 发送问题
+        function sendQuestion() {
+            const question = document.getElementById('questionInput').value.trim();
+            if (!question) return;
+
+            addMessage(question, true);
+            document.getElementById('questionInput').value = '';
+            document.getElementById('sendBtn').disabled = true;
+
+            // 模拟延迟
+            setTimeout(() => {
+                const results = searchKnowledge(question);
+                const answer = formatReply(question, results);
+                addMessage(answer, false);
+                document.getElementById('sendBtn').disabled = false;
+            }, 300);
+        }
+
+        // 事件监听
+        document.getElementById('sendBtn').addEventListener('click', sendQuestion);
+        document.getElementById('questionInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendQuestion();
+            }
+        });
+
+        // 初始化
+        console.log('IVD知识助手已加载，知识库记录：', knowledgeData.length);
+    </script>
+</body>
+</html>

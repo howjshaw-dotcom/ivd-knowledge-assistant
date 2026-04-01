@@ -1,0 +1,19 @@
+{
+  "name": "ivd-knowledge-assistant-web",
+  "version": "1.0.0",
+  "description": "IVD知识助手网页版",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "萧嘉浩",
+  "license": "MIT"
+}
