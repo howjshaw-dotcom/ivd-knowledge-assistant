@@ -1,420 +1,127 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IVD知识助手 - 全自动间接免疫荧光分析仪故障问答</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
-
-        .chat-container {
-            height: 500px;
-            overflow-y: auto;
-            padding: 20px;
-            background: #f8f9fa;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message-bubble {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        .message.user .message-bubble {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.assistant .message-bubble {
-            background: white;
-            border: 1px solid #e1e4e8;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .message-time {
-            font-size: 11px;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        .input-area {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e1e4e8;
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: 10px;
-        }
-
-        #questionInput {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e1e4e8;
-            border-radius: 25px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        #questionInput:focus {
-            border-color: #667eea;
-        }
-
-        #sendBtn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        #sendBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        #sendBtn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .typing-indicator {
-            display: none;
-            padding: 12px 16px;
-            background: white;
-            border: 1px solid #e1e4e8;
-            border-radius: 18px;
-            border-bottom-left-radius: 4px;
-            width: fit-content;
-            margin-bottom: 15px;
-        }
-
-        .typing-indicator span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #999;
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-
-        .quick-questions {
-            padding: 15px 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #e1e4e8;
-        }
-
-        .quick-questions h3 {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .quick-questions .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .tag {
-            padding: 6px 12px;
-            background: white;
-            border: 1px solid #e1e4e8;
-            border-radius: 15px;
-            font-size: 12px;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .tag:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .knowledge-stats {
-            padding: 15px 20px;
-            background: #fff;
-            border-bottom: 1px solid #e1e4e8;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .knowledge-stats span {
-            margin-right: 20px;
-        }
-
-        .knowledge-stats strong {
-            color: #333;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IVD知识助手</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',PingFang SC,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;padding:20px}
+.container{max-width:900px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:30px;text-align:center}
+.header h1{font-size:28px;margin-bottom:10px}
+.chat-container{height:500px;overflow-y:auto;padding:20px;background:#f8f9fa}
+.message{margin-bottom:15px;display:flex;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.message.user{justify-content:flex-end}
+.message-bubble{max-width:70%;padding:12px 16px;border-radius:18px;line-height:1.5}
+.message.user .message-bubble{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-bottom-right-radius:4px}
+.message.assistant .message-bubble{background:#fff;border:1px solid #e1e4e8;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.message-time{font-size:11px;color:#999;margin-top:5px;text-align:right}
+.input-area{padding:20px;background:#fff;border-top:1px solid #e1e4e8}
+.input-wrapper{display:flex;gap:10px}
+#questionInput{flex:1;padding:12px 16px;border:2px solid #e1e4e8;border-radius:25px;font-size:14px;outline:none}
+#sendBtn{padding:12px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:25px;cursor:pointer}
+#sendBtn:disabled{opacity:0.6}
+.quick-questions{padding:15px 20px;background:#f8f9fa}
+.quick-questions h3{font-size:13px;color:#666;margin-bottom:10px}
+.quick-questions .tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{padding:6px 12px;background:#fff;border:1px solid #e1e4e8;border-radius:15px;font-size:12px;cursor:pointer}
+.tag:hover{background:#667eea;color:#fff}
+.knowledge-stats{padding:15px 20px;background:#fff;border-bottom:1px solid #e1e4e8;font-size:12px;color:#666}
+.loading{color:#999;font-style:italic}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔬 IVD知识助手</h1>
-            <p>全自动间接免疫荧光分析仪故障问答系统</p>
-        </div>
+<div class="container">
+<div class="header"><h1>🔬 IVD知识助手</h1></div>
+<div class="knowledge-stats"><span>📚 知识库：<strong>20条</strong></span><span>📋 模块：<strong>12个</strong></span></div>
+<div class="chat-container" id="chatContainer">
+<div class="message assistant"><div class="message-bubble">您好！我是IVD知识助手。<br>请描述故障现象，我会从知识库中检索解决方案。</div></div>
+</div>
+<div class="input-area"><div class="input-wrapper"><input type="text" id="questionInput" placeholder="请输入故障描述..."><button id="sendBtn">提问</button></div></div>
+<div class="quick-questions"><h3>快速提问：</h3><div class="tags">
+<span class="tag" onclick="quickAsk('加样臂干涉')">加样臂干涉</span>
+<span class="tag" onclick="quickAsk('抓手')">抓手</span>
+<span class="tag" onclick="quickAsk('泵盒')">泵盒</span>
+<span class="tag" onclick="quickAsk('试剂仓')">试剂仓</span>
+<span class="tag" onclick="quickAsk('盖玻片')">盖玻片</span>
+<span class="tag" onclick="quickAsk('样本轨道')">样本轨道</span>
+</div></div>
+</div>
+<script>
+// 完整知识库
+var knowledgeData = [
+{分类:'结构设计',模块:'加样臂模块B',原因:'结构干涉',临时:'自行加工处理',永久:'结构修改图纸',部门:'结构'},
+{分类:'结构设计',模块:'加样臂模块B',原因:'结构未做避让',临时:'暂时使用',永久:'结构修改图纸',部门:'结构'},
+{分类:'来料不良',模块:'样本轨道模块',原因:'来料不良',临时:'退料处理',永久:'来料检查',部门:'IQC'},
+{分类:'结构设计',模块:'样本轨道模块',原因:'图纸漏标注',临时:'自行加工',永久:'修改图纸',部门:'结构'},
+{分类:'来料不良',模块:'泵盒模块',原因:'来料不良',临时:'自行加工',永久:'来料检查',部门:'IQC'},
+{分类:'结构设计',模块:'泵盒模块',原因:'设计错误',临时:'自行加工',永久:'修改图纸',部门:'结构'},
+{分类:'结构设计',模块:'抓手臂模块',原因:'PCB与电机间距过小',临时:'先插端子在锁板',永久:'增加间距',部门:'电子、结构'},
+{分类:'结构设计',模块:'抓手臂模块',原因:'未考虑线束导向',临时:'用扎带固定',永久:'贴醋酸胶布固定',部门:'结构'},
+{分类:'结构设计',模块:'试剂仓模块',原因:'螺丝孔过多',临时:'暂时使用',永久:'减少螺丝',部门:'结构'},
+{分类:'结构设计',模块:'盖玻片分离模块',原因:'电机丝杆自锁',临时:'-',永久:'修改锁紧方式',部门:'结构'},
+{分类:'工艺',模块:'加样臂模块A',原因:'来料同心度问题',临时:'自行调节',永久:'设计检验治具',部门:'工艺'},
+{分类:'结构设计',模块:'加样臂模块A',原因:'未做地线固定',临时:'自行调节',永久:'修改图纸',部门:'结构'},
+{分类:'电子设计',模块:'加样臂模块A',原因:'端子位置需对调',临时:'先使用',永久:'修改PCBA',部门:'电子'},
+{分类:'电子设计',模块:'整机框架模块',原因:'走线问题',临时:'先使用',永久:'改走线',部门:'工艺'},
+{分类:'结构设计',模块:'整机框架模块',原因:'加工误差',临时:'先使用',永久:'新版已修改',部门:'结构'},
+{分类:'来料不良',模块:'整机框架模块',原因:'未做表面处理',临时:'除锈剂处理',永久:'图纸标注',部门:'采购、结构'},
+{分类:'结构设计',模块:'稀释板运输模块',原因:'间隙过小',临时:'-',永久:'加大避空',部门:'结构'},
+{分类:'结构设计',模块:'加样臂模块A',原因:'间隙过大',临时:'先使用',永久:'改小间隙',部门:'结构'},
+{分类:'结构设计',模块:'加样臂模块A',原因:'间隙过大',临时:'先使用',永久:'增加限位',部门:'结构'},
+{分类:'结构设计',模块:'整机框架模块',原因:'有干涉摩擦',临时:'自行调节',永久:'优化结构',部门:'结构'}
+];
 
-        <div class="knowledge-stats">
-            <span>📚 知识库记录：<strong id="recordCount">加载中...</strong></span>
-            <span>📋 覆盖模块：<strong>12个</strong></span>
-            <span>🏷️ 故障分类：<strong>50+种</strong></span>
-        </div>
+function search(q){
+var k=q.toLowerCase();
+return knowledgeData.filter(function(r){
+return(k.includes('加样')&&r.模块.includes('加样'))||(k.includes('抓手')&&r.模块.includes('抓'))||(k.includes('泵')&&r.模块.includes('泵'))||(k.includes('试剂')&&r.模块.includes('试剂'))||(k.includes('盖玻')&&r.模块.includes('盖玻'))||(k.includes('轨道')&&r.模块.includes('轨道'))||(k.includes('框架')&&r.模块.includes('框架'))||(k.includes('稀释')&&r.模块.includes('稀释'));
+});
+}
 
-        <div class="chat-container" id="chatContainer">
-            <div class="message assistant">
-                <div class="message-bubble">
-                    您好！我是IVD知识助手，专门解答全自动间接免疫荧光分析仪的故障问题。<br><br>
-                    我可以帮您：<br>
-                    ✓ 查询历史故障记录<br>
-                    ✓ 提供临时处理措施<br>
-                    ✓ 分析根本原因<br>
-                    ✓ 给出永久解决方案<br><br>
-                    请描述您遇到的故障现象，我会从知识库中检索相关解决方案。
-                </div>
-            </div>
-        </div>
+function format(r){
+var s='🔍 故障查询结果\n━━━━━━━━━━━━━━━━\n';
+if(r.分类)s+='📋 分类：'+r.分类+'\n';
+if(r.模块)s+='📦 模块：'+r.模块+'\n';
+if(r.原因)s+='🔍 原因：'+r.原因+'\n';
+s+='🔧 处理：临时-'+r.临时+' | 永久-'+r.永久+'\n';
+s+='🏢 部门：'+r.部门+'\n━━━━━━━━━━━━━━━━';
+return s;
+}
 
-        <div class="typing-indicator" id="typingIndicator">
-            <span></span><span></span><span></span>
-        </div>
+function add(c,isUser){
+var d=document.createElement('div');
+d.className='message '+(isUser?'user':'assistant');
+d.innerHTML='<div class="message-bubble">'+c.replace(/\n/g,'<br>')+'</div><div class="message-time">'+new Date().toTimeString().slice(0,5)+'</div>';
+document.getElementById('chatContainer').appendChild(d);
+document.getElementById('chatContainer').scrollTop=9999;
+}
 
-        <div class="input-area">
-            <div class="input-wrapper">
-                <input type="text" id="questionInput" placeholder="请输入故障描述，如：'加样臂干涉'、'样本针歪斜'、'泵盒漏液'..." autocomplete="off">
-                <button id="sendBtn">提问</button>
-            </div>
-        </div>
-
-        <div class="quick-questions">
-            <h3>快速提问（点击即可）：</h3>
-            <div class="tags">
-                <span class="tag" onclick="quickAsk('加样臂干涉')">加样臂干涉</span>
-                <span class="tag" onclick="quickAsk('样本针歪斜')">样本针歪斜</span>
-                <span class="tag" onclick="quickAsk('泵盒漏液')">泵盒漏液</span>
-                <span class="tag" onclick="quickAsk('抓手模块故障')">抓手模块故障</span>
-                <span class="tag" onclick="quickAsk('试剂仓问题')">试剂仓问题</span>
-                <span class="tag" onclick="quickAsk('盖玻片分离异常')">盖玻片分离异常</span>
-                <span class="tag" onclick="quickAsk('来料不良')">来料不良</span>
-                <span class="tag" onclick="quickAsk('结构干涉')">结构干涉</span>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 配置
-        const CONFIG = {
-            // 飞书应用配置（需要替换为实际值）
-            appId: 'cli_xxx', // 飞书应用 App ID
-            appSecret: 'xxx', // 飞书应用 App Secret
-            // 多维表格配置
-            bitableAppToken: 'G7rNbB7q8aniNcsq1AlcsZ3jnQB',
-            bitableTableId: 'tbl2icGQLEaU88ow'
-        };
-
-        const chatContainer = document.getElementById('chatContainer');
-        const questionInput = document.getElementById('questionInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const typingIndicator = document.getElementById('typingIndicator');
-
-        // 加载知识库统计
-        async function loadStats() {
-            try {
-                // 这里应该调用后端API获取记录数
-                // 暂时显示固定值
-                document.getElementById('recordCount').textContent = '50+';
-            } catch (error) {
-                console.error('加载统计失败:', error);
-            }
-        }
-
-        // 添加消息到聊天界面
-        function addMessage(content, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
-
-            const bubble = document.createElement('div');
-            bubble.className = 'message-bubble';
-            bubble.innerHTML = content.replace(/\n/g, '<br>');
-
-            const time = document.createElement('div');
-            time.className = 'message-time';
-            const now = new Date();
-            time.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-            messageDiv.appendChild(bubble);
-            messageDiv.appendChild(time);
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        // 显示/隐藏输入状态
-        function setTyping(show) {
-            typingIndicator.style.display = show ? 'block' : 'none';
-            if (show) {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-        }
-
-        // 快速提问
-        function quickAsk(question) {
-            questionInput.value = question;
-            sendQuestion();
-        }
-
-        // 发送问题
-        async function sendQuestion() {
-            const question = questionInput.value.trim();
-            if (!question) return;
-
-            // 显示用户问题
-            addMessage(question, true);
-            questionInput.value = '';
-            sendBtn.disabled = true;
-
-            // 显示正在输入
-            setTyping(true);
-
-            try {
-                // 调用后端API（需要您部署后端服务）
-                const response = await fetch('/api/ask', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ question })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                setTyping(false);
-
-                // 显示回答
-                addMessage(formatAnswer(data), false);
-
-            } catch (error) {
-                console.error('Error:', error);
-                setTyping(false);
-                addMessage('抱歉，服务器连接失败。请确保后端服务已启动。', false);
-            } finally {
-                sendBtn.disabled = false;
-            }
-        }
-
-        // 格式化回答
-        function formatAnswer(data) {
-            // 后端直接返回格式化好的文本
-            if (data.answer) {
-                return data.answer;
-            }
-
-            // 兼容旧格式（对象结构）
-            if (data.category || data.causes) {
-                let html = `<strong>📋 问题分类：</strong>${data.category || '未知'}<br><br>`;
-                html += `<strong>💡 可能原因：</strong><br>${data.causes ? data.causes.join('<br>') : '暂无'}<br><br>`;
-                html += `<strong>🔧 推荐处理措施：</strong><br>${data.solutions ? data.solutions.join('<br>') : '暂无'}<br><br>`;
-                html += `<strong>✅ 验证方法：</strong><br>${data.verification || '连续测试50杯样本，观察是否还有报警'}<br><br>`;
-
-                if (data.related && data.related.length > 0) {
-                    html += `<strong>📚 相关故障：</strong><br>`;
-                    data.related.forEach(rec => {
-                        html += `• ${rec.异常描述}<br>`;
-                    });
-                }
-
-                html += `<br><em>数据来源：全自动间接免疫荧光分析仪故障知识库</em>`;
-                return html;
-            }
-
-            return '未找到相关答案，请尝试其他关键词或联系砖家。';
-        }
-
-        // 事件监听
-        sendBtn.addEventListener('click', sendQuestion);
-        questionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendQuestion();
-            }
-        });
-
-        // 初始化
-        loadStats();
-    </script>
+function send(){
+var q=document.getElementById('questionInput').value.trim();
+if(!q)return;
+add(q,true);
+document.getElementById('sendBtn').disabled=true;
+add('🔍 正在分析...',false);
+setTimeout(function(){
+var rs=search(q);
+var msgs=document.querySelectorAll('.message.assistant');
+if(msgs.length>0)msgs[msgs.length-1].remove();
+if(rs.length>0){
+add(format(rs[0]),false);
+if(rs.length>1)add('📚 相关：'+(rs.length-1)+'条',false);
+}else{
+add('抱歉，未找到匹配结果。\n\n💡 请尝试：加样臂、抓手、泵盒、试剂仓、盖玻片、样本轨道等关键词\n\n🔧 如需深入分析，请联系砖家',false);
+}
+document.getElementById('sendBtn').disabled=false;
+document.getElementById('questionInput').value='';
+},500);
+}
+document.getElementById('sendBtn').addEventListener('click',send);
+document.getElementById('questionInput').addEventListener('keypress',function(e){if(e.key==='Enter')send()});
+function quickAsk(q){document.getElementById('questionInput').value=q;send()}
+</script>
 </body>
 </html>
