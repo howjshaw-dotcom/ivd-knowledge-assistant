@@ -22,14 +22,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',PingFang SC,sans-se
 .input-wrapper{display:flex;gap:10px}
 #questionInput{flex:1;padding:12px 16px;border:2px solid #e1e4e8;border-radius:25px;font-size:14px;outline:none}
 #sendBtn{padding:12px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:25px;cursor:pointer}
-#sendBtn:disabled{opacity:0.6}
 .quick-questions{padding:15px 20px;background:#f8f9fa}
 .quick-questions h3{font-size:13px;color:#666;margin-bottom:10px}
 .quick-questions .tags{display:flex;flex-wrap:wrap;gap:8px}
 .tag{padding:6px 12px;background:#fff;border:1px solid #e1e4e8;border-radius:15px;font-size:12px;cursor:pointer}
 .tag:hover{background:#667eea;color:#fff}
 .knowledge-stats{padding:15px 20px;background:#fff;border-bottom:1px solid #e1e4e8;font-size:12px;color:#666}
-.loading{color:#999;font-style:italic}
 </style>
 </head>
 <body>
@@ -42,86 +40,115 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',PingFang SC,sans-se
 <div class="input-area"><div class="input-wrapper"><input type="text" id="questionInput" placeholder="请输入故障描述..."><button id="sendBtn">提问</button></div></div>
 <div class="quick-questions"><h3>快速提问：</h3><div class="tags">
 <span class="tag" onclick="quickAsk('加样臂干涉')">加样臂干涉</span>
-<span class="tag" onclick="quickAsk('抓手')">抓手</span>
-<span class="tag" onclick="quickAsk('泵盒')">泵盒</span>
-<span class="tag" onclick="quickAsk('试剂仓')">试剂仓</span>
-<span class="tag" onclick="quickAsk('盖玻片')">盖玻片</span>
-<span class="tag" onclick="quickAsk('样本轨道')">样本轨道</span>
+<span class="tag" onclick="quickAsk('抓手故障')">抓手故障</span>
+<span class="tag" onclick="quickAsk('泵盒漏液')">泵盒漏液</span>
+<span class="tag" onclick="quickAsk('试剂仓问题')">试剂仓问题</span>
+<span class="tag" onclick="quickAsk('盖玻片分离')">盖玻片分离</span>
+<span class="tag" onclick="quickAsk('来料不良')">来料不良</span>
 </div></div>
 </div>
 <script>
-// 完整知识库
+// 完整知识库 - 按关键词精确匹配
 var knowledgeData = [
-{分类:'结构设计',模块:'加样臂模块B',原因:'结构干涉',临时:'自行加工处理',永久:'结构修改图纸',部门:'结构'},
-{分类:'结构设计',模块:'加样臂模块B',原因:'结构未做避让',临时:'暂时使用',永久:'结构修改图纸',部门:'结构'},
-{分类:'来料不良',模块:'样本轨道模块',原因:'来料不良',临时:'退料处理',永久:'来料检查',部门:'IQC'},
-{分类:'结构设计',模块:'样本轨道模块',原因:'图纸漏标注',临时:'自行加工',永久:'修改图纸',部门:'结构'},
-{分类:'来料不良',模块:'泵盒模块',原因:'来料不良',临时:'自行加工',永久:'来料检查',部门:'IQC'},
-{分类:'结构设计',模块:'泵盒模块',原因:'设计错误',临时:'自行加工',永久:'修改图纸',部门:'结构'},
-{分类:'结构设计',模块:'抓手臂模块',原因:'PCB与电机间距过小',临时:'先插端子在锁板',永久:'增加间距',部门:'电子、结构'},
-{分类:'结构设计',模块:'抓手臂模块',原因:'未考虑线束导向',临时:'用扎带固定',永久:'贴醋酸胶布固定',部门:'结构'},
-{分类:'结构设计',模块:'试剂仓模块',原因:'螺丝孔过多',临时:'暂时使用',永久:'减少螺丝',部门:'结构'},
-{分类:'结构设计',模块:'盖玻片分离模块',原因:'电机丝杆自锁',临时:'-',永久:'修改锁紧方式',部门:'结构'},
-{分类:'工艺',模块:'加样臂模块A',原因:'来料同心度问题',临时:'自行调节',永久:'设计检验治具',部门:'工艺'},
-{分类:'结构设计',模块:'加样臂模块A',原因:'未做地线固定',临时:'自行调节',永久:'修改图纸',部门:'结构'},
-{分类:'电子设计',模块:'加样臂模块A',原因:'端子位置需对调',临时:'先使用',永久:'修改PCBA',部门:'电子'},
-{分类:'电子设计',模块:'整机框架模块',原因:'走线问题',临时:'先使用',永久:'改走线',部门:'工艺'},
-{分类:'结构设计',模块:'整机框架模块',原因:'加工误差',临时:'先使用',永久:'新版已修改',部门:'结构'},
-{分类:'来料不良',模块:'整机框架模块',原因:'未做表面处理',临时:'除锈剂处理',永久:'图纸标注',部门:'采购、结构'},
-{分类:'结构设计',模块:'稀释板运输模块',原因:'间隙过小',临时:'-',永久:'加大避空',部门:'结构'},
-{分类:'结构设计',模块:'加样臂模块A',原因:'间隙过大',临时:'先使用',永久:'改小间隙',部门:'结构'},
-{分类:'结构设计',模块:'加样臂模块A',原因:'间隙过大',临时:'先使用',永久:'增加限位',部门:'结构'},
-{分类:'结构设计',模块:'整机框架模块',原因:'有干涉摩擦',临时:'自行调节',永久:'优化结构',部门:'结构'}
+{关键词:['加样臂','干涉','挡片'],分类:'结构设计',模块:'加样臂模块B',原因:'结构干涉',临时:'自行加工处理',永久:'结构修改图纸',部门:'结构'},
+{关键词:['加样臂','晃动','针头'],分类:'结构设计',模块:'加样臂模块A',原因:'间隙过大',临时:'先使用',永久:'改小间隙',部门:'结构'},
+{关键词:['加样针','歪斜','同心度'],分类:'工艺',模块:'加样臂模块A',原因:'来料同心度问题',临时:'自行调节',永久:'设计检验治具',部门:'工艺'},
+{关键词:['加样臂','接地','排线'],分类:'结构设计',模块:'加样臂模块A',原因:'未做地线固定',临时:'自行调节',永久:'修改图纸',部门:'结构'},
+{关键词:['加样臂','排线','交叉'],分类:'电子设计',模块:'加样臂模块A',原因:'端子位置需对调',临时:'先使用',永久:'修改PCBA',部门:'电子'},
+{关键词:['抓手','电机','端子'],分类:'结构设计',模块:'抓手臂模块',原因:'PCB与电机间距过小',临时:'先插端子在锁板',永久:'增加间距',部门:'电子、结构'},
+{关键词:['抓手','气管','磨损'],分类:'结构设计',模块:'抓手臂模块',原因:'未考虑线束导向',临时:'用扎带固定',永久:'贴醋酸胶布固定',部门:'结构'},
+{关键词:['泵盒','固定板','孔加工'],分类:'来料不良',模块:'泵盒模块',原因:'来料不良',临时:'自行加工',永久:'来料检查',部门:'IQC'},
+{关键词:['泵盒','压力','安装孔'],分类:'结构设计',模块:'泵盒模块',原因:'设计错误',临时:'自行加工',永久:'修改图纸',部门:'结构'},
+{关键词:['试剂仓','轨道','螺丝'],分类:'结构设计',模块:'试剂仓模块',原因:'螺丝孔过多',临时:'暂时使用',永久:'减少螺丝',部门:'结构'},
+{关键词:['试剂仓','门','关不上'],分类:'结构设计',模块:'整机框架模块',原因:'有干涉摩擦',临时:'自行调节',永久:'优化结构',部门:'结构'},
+{关键词:['盖玻片','Z轴','螺母'],分类:'结构设计',模块:'盖玻片分离模块',原因:'电机丝杆自锁',临时:'-',永久:'修改锁紧方式',部门:'结构'},
+{关键词:['样本轨道','阻拦','来料'],分类:'来料不良',模块:'样本轨道模块',原因:'来料不良',临时:'退料处理',永久:'来料检查',部门:'IQC'},
+{关键词:['样本轨道','安装板','螺纹孔'],分类:'结构设计',模块:'样本轨道模块',原因:'图纸漏标注',临时:'自行加工',永久:'修改图纸',部门:'结构'},
+{关键词:['稀释板','运输','干涉'],分类:'结构设计',模块:'稀释板运输模块',原因:'间隙过小',临时:'-',永久:'加大避空',部门:'结构'},
+{关键词:['框架','导轨','生锈'],分类:'来料不良',模块:'整机框架模块',原因:'未做表面处理',临时:'除锈剂处理',永久:'图纸标注',部门:'采购、结构'},
+{关键词:['框架','外壳','缝隙'],分类:'结构设计',模块:'整机框架模块',原因:'加工误差',临时:'先使用',永久:'新版已修改',部门:'结构'},
+{关键词:['显示器','信号线','短'],分类:'电子设计',模块:'整机框架模块',原因:'走线问题',临时:'先使用',永久:'改走线',部门:'工艺'},
+{关键词:['泵','Z向','滑块'],分类:'结构设计',模块:'加样臂模块B',原因:'结构未做避让',临时:'暂时使用',永久:'结构修改图纸',部门:'结构'}
 ];
 
-function search(q){
-var k=q.toLowerCase();
-return knowledgeData.filter(function(r){
-return(k.includes('加样')&&r.模块.includes('加样'))||(k.includes('抓手')&&r.模块.includes('抓'))||(k.includes('泵')&&r.模块.includes('泵'))||(k.includes('试剂')&&r.模块.includes('试剂'))||(k.includes('盖玻')&&r.模块.includes('盖玻'))||(k.includes('轨道')&&r.模块.includes('轨道'))||(k.includes('框架')&&r.模块.includes('框架'))||(k.includes('稀释')&&r.模块.includes('稀释'));
+// 精确搜索函数
+function search(q) {
+var qLower = q.toLowerCase();
+var results = [];
+
+// 遍历知识库，精确匹配
+knowledgeData.forEach(function(item) {
+var matchCount = 0;
+item.关键词.forEach(function(keyword) {
+if (qLower.includes(keyword)) {
+matchCount++;
+}
 });
+// 只有匹配2个以上关键词才算匹配
+if (matchCount >= 1) {
+results.push({item: item, score: matchCount});
+}
+});
+
+// 按匹配度排序
+results.sort(function(a, b) { return b.score - a.score; });
+
+// 返回排序后的结果
+return results.map(function(r) { return r.item; });
 }
 
-function format(r){
-var s='🔍 故障查询结果\n━━━━━━━━━━━━━━━━\n';
-if(r.分类)s+='📋 分类：'+r.分类+'\n';
-if(r.模块)s+='📦 模块：'+r.模块+'\n';
-if(r.原因)s+='🔍 原因：'+r.原因+'\n';
-s+='🔧 处理：临时-'+r.临时+' | 永久-'+r.永久+'\n';
-s+='🏢 部门：'+r.部门+'\n━━━━━━━━━━━━━━━━';
+// 格式化回复
+function format(r) {
+var s = '🔍 故障查询结果\n━━━━━━━━━━━━━━━━\n';
+if (r.分类) s += '📋 分类：' + r.分类 + '\n';
+if (r.模块) s += '📦 模块：' + r.模块 + '\n';
+if (r.原因) s += '🔍 原因：' + r.原因 + '\n';
+s += '🔧 处理：';
+if (r.临时 && r.临时 !== '-') s += '临时-' + r.临时 + '; ';
+if (r.永久) s += '永久-' + r.永久;
+s += '\n';
+if (r.部门) s += '🏢 部门：' + r.部门 + '\n';
+s += '━━━━━━━━━━━━━━━━';
 return s;
 }
 
-function add(c,isUser){
-var d=document.createElement('div');
-d.className='message '+(isUser?'user':'assistant');
-d.innerHTML='<div class="message-bubble">'+c.replace(/\n/g,'<br>')+'</div><div class="message-time">'+new Date().toTimeString().slice(0,5)+'</div>';
+// 添加消息
+function add(c, isUser) {
+var d = document.createElement('div');
+d.className = 'message ' + (isUser ? 'user' : 'assistant');
+d.innerHTML = '<div class="message-bubble">' + c.replace(/\n/g, '<br>') + '</div><div class="message-time">' + new Date().toTimeString().slice(0,5) + '</div>';
 document.getElementById('chatContainer').appendChild(d);
-document.getElementById('chatContainer').scrollTop=9999;
+document.getElementById('chatContainer').scrollTop = 9999;
 }
 
-function send(){
-var q=document.getElementById('questionInput').value.trim();
-if(!q)return;
-add(q,true);
-document.getElementById('sendBtn').disabled=true;
-add('🔍 正在分析...',false);
-setTimeout(function(){
-var rs=search(q);
-var msgs=document.querySelectorAll('.message.assistant');
-if(msgs.length>0)msgs[msgs.length-1].remove();
-if(rs.length>0){
-add(format(rs[0]),false);
-if(rs.length>1)add('📚 相关：'+(rs.length-1)+'条',false);
-}else{
-add('抱歉，未找到匹配结果。\n\n💡 请尝试：加样臂、抓手、泵盒、试剂仓、盖玻片、样本轨道等关键词\n\n🔧 如需深入分析，请联系砖家',false);
+// 发送问题
+function send() {
+var q = document.getElementById('questionInput').value.trim();
+if (!q) return;
+add(q, true);
+document.getElementById('sendBtn').disabled = true;
+add('🔍 正在分析...', false);
+
+setTimeout(function() {
+var rs = search(q);
+var msgs = document.querySelectorAll('.message.assistant');
+if (msgs.length > 0) msgs[msgs.length - 1].remove();
+
+if (rs.length > 0) {
+add(format(rs[0]), false);
+if (rs.length > 1) add('📚 相关：' + (rs.length - 1) + '条', false);
+} else {
+add('抱歉，未找到匹配结果。\n\n💡 请尝试其他关键词，如：\n• 加样臂、抓手、泵盒\n• 试剂仓、盖玻片\n• 来料不良、干涉等\n\n🔧 如需深入分析，请联系砖家', false);
 }
-document.getElementById('sendBtn').disabled=false;
-document.getElementById('questionInput').value='';
-},500);
+document.getElementById('sendBtn').disabled = false;
+document.getElementById('questionInput').value = '';
+}, 500);
 }
-document.getElementById('sendBtn').addEventListener('click',send);
-document.getElementById('questionInput').addEventListener('keypress',function(e){if(e.key==='Enter')send()});
-function quickAsk(q){document.getElementById('questionInput').value=q;send()}
+
+document.getElementById('sendBtn').addEventListener('click', send);
+document.getElementById('questionInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') send(); });
+
+function quickAsk(q) { document.getElementById('questionInput').value = q; send(); }
 </script>
 </body>
 </html>
