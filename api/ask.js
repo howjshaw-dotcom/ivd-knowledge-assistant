@@ -1,5 +1,60 @@
 // IVD知识助手 API - 带砖家审核功能
 
+// 飞书Webhook配置
+const WEBHOOK_URL = "https://open.feishu.cn/open-apis/bot/v2/hook/dc6b3749-9913-40f4-a474-d1282cba5895";
+const SIGN_SECRET = "AvQ3if0bsEDE56XWtbdrlb";
+
+// 生成签名
+function generateSign(secret, timestamp) {
+    const crypto = require('crypto');
+    const stringToSign = timestamp + '\n' + secret;
+    const hmac = crypto.createHmac('sha256', secret);
+    hmac.update(stringToSign);
+    return hmac.digest('base64');
+}
+
+// 发送Webhook通知
+async function notifyExpert(question) {
+    const timestamp = Math.floor(Date.now() / 1000);
+    const sign = generateSign(SIGN_SECRET, timestamp);
+    
+    const payload = {
+        msg_type: "interactive",
+        card: {
+            header: {
+                title: { tag: "plain_text", content: "🔬 IVD知识助手 - 新问题待审核" },
+                color: "blue"
+            },
+            elements: [
+                {
+                    tag: "markdown",
+                    content: `**用户提问：**\n${question}\n\n---\n💡 请砖家及时处理`
+                },
+                {
+                    tag: "div",
+                    text: { tag: "plain_text", content: "⏰ 提交时间: " + new Date().toLocaleString('zh-CN') }
+                }
+            ]
+        }
+    };
+
+    const urlWithParams = `${WEBHOOK_URL}&timestamp=${timestamp}&sign=${encodeURIComponent(sign)}`;
+    
+    try {
+        const response = await fetch(urlWithParams, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        console.log('[Webhook通知结果]', result);
+        return result.code === 0;
+    } catch (error) {
+        console.error('[Webhook发送失败]', error);
+        return false;
+    }
+}
+
 const knowledgeData = [
 {关键词:['加样臂','干涉','挡片'],分类:'结构设计',模块:'加样臂模块B',原因:'结构干涉',临时:'自行加工处理',永久:'结构修改图纸',部门:'结构'},
 {关键词:['加样臂','晃动','针头'],分类:'结构设计',模块:'加样臂模块A',原因:'间隙过大',临时:'先使用',永久:'改小间隙',部门:'结构'},
@@ -78,10 +133,15 @@ module.exports = async function(req, res) {
             });
         } else {
             // 知识库无结果 - 需要砖家审核
+            // 异步发送Webhook通知，不阻塞响应
+            notifyExpert(question).then(sent => {
+                console.log('[砖家通知]', sent ? '发送成功' : '发送失败');
+            });
+            
             res.json({
                 success: true,
                 question: question,
-                answer: '⏳ 您的问题正在提交给砖家审核，请稍候...\n\n📝 问题已记录：' + question + '\n\n💡 如需紧急帮助，请直接在飞书联系砖家',
+                answer: '⏳ 您的问题正在提交给砖家审核，请稍候...\n\n📝 问题已记录：' + question + '\n\n💡 砖家会尽快处理，请保持关注',
                 count: 0,
                 source: 'pending',
                 needExpert: true,
